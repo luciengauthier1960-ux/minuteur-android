@@ -20,6 +20,7 @@ import android.widget.Toast
 class MainActivity : Activity() {
 
     private lateinit var minutesInput: EditText
+    private lateinit var secondsInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +38,30 @@ class MainActivity : Activity() {
             setPadding(0, 0, 0, 48)
         }
 
+        val inputRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+
         minutesInput = EditText(this).apply {
-            hint = "Durée en minutes"
+            hint = "Minutes"
             inputType = InputType.TYPE_CLASS_NUMBER
             setText("5")
         }
+
+        secondsInput = EditText(this).apply {
+            hint = "Secondes"
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText("0")
+        }
+
+        val rowParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+            marginStart = 8
+            marginEnd = 8
+        }
+
+        inputRow.addView(minutesInput, rowParams)
+        inputRow.addView(secondsInput, rowParams)
 
         val startButton = Button(this).apply {
             text = "Démarrer l'alarme"
@@ -50,7 +70,7 @@ class MainActivity : Activity() {
 
         root.addView(title)
         root.addView(
-            minutesInput,
+            inputRow,
             LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         )
         root.addView(startButton)
@@ -74,9 +94,12 @@ class MainActivity : Activity() {
     }
 
     private fun scheduleAlarm() {
-        val minutes = minutesInput.text.toString().toIntOrNull()
-        if (minutes == null || minutes <= 0) {
-            Toast.makeText(this, "Entre un nombre de minutes valide", Toast.LENGTH_SHORT).show()
+        val minutes = minutesInput.text.toString().toIntOrNull() ?: 0
+        val seconds = secondsInput.text.toString().toIntOrNull() ?: 0
+        val totalSeconds = minutes * 60 + seconds
+
+        if (totalSeconds <= 0) {
+            Toast.makeText(this, "Entre une durée valide", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -88,7 +111,7 @@ class MainActivity : Activity() {
             return
         }
 
-        val triggerAt = System.currentTimeMillis() + minutes * 60_000L
+        val triggerAt = System.currentTimeMillis() + totalSeconds * 1000L
 
         val intent = Intent(this, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
@@ -98,6 +121,6 @@ class MainActivity : Activity() {
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
 
-        Toast.makeText(this, "Alarme programmée dans $minutes min", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Alarme programmée dans ${minutes} min ${seconds} s", Toast.LENGTH_SHORT).show()
     }
 }
