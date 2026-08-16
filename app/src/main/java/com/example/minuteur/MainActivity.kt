@@ -43,25 +43,49 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
         }
 
-        minutesInput = EditText(this).apply {
-            hint = "Minutes"
-            inputType = InputType.TYPE_CLASS_NUMBER
-            setText("5")
-        }
-
-        secondsInput = EditText(this).apply {
-            hint = "Secondes"
-            inputType = InputType.TYPE_CLASS_NUMBER
-            setText("0")
-        }
-
-        val rowParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+        val columnParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
             marginStart = 8
             marginEnd = 8
         }
 
-        inputRow.addView(minutesInput, rowParams)
-        inputRow.addView(secondsInput, rowParams)
+        // Colonne "Minutes"
+        val minutesColumn = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+        }
+        val minutesLabel = TextView(this).apply {
+            text = "Minutes"
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 8)
+        }
+        minutesInput = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText("5")
+            gravity = Gravity.CENTER
+        }
+        minutesColumn.addView(minutesLabel)
+        minutesColumn.addView(minutesInput)
+
+        // Colonne "Secondes"
+        val secondsColumn = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+        }
+        val secondsLabel = TextView(this).apply {
+            text = "Secondes"
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 8)
+        }
+        secondsInput = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText("0")
+            gravity = Gravity.CENTER
+        }
+        secondsColumn.addView(secondsLabel)
+        secondsColumn.addView(secondsInput)
+
+        inputRow.addView(minutesColumn, columnParams)
+        inputRow.addView(secondsColumn, columnParams)
 
         val startButton = Button(this).apply {
             text = "Démarrer l'alarme"
