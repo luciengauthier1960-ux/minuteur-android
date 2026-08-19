@@ -48,7 +48,6 @@ class MainActivity : Activity() {
             marginEnd = 8
         }
 
-        // Colonne "Minutes"
         val minutesColumn = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -66,7 +65,6 @@ class MainActivity : Activity() {
         minutesColumn.addView(minutesLabel)
         minutesColumn.addView(minutesInput)
 
-        // Colonne "Secondes"
         val secondsColumn = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -92,12 +90,20 @@ class MainActivity : Activity() {
             setOnClickListener { scheduleAlarm() }
         }
 
+        val chronometerButton = Button(this).apply {
+            text = "Chronomètre"
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, ChronometerActivity::class.java))
+            }
+        }
+
         root.addView(title)
         root.addView(
             inputRow,
             LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         )
         root.addView(startButton)
+        root.addView(chronometerButton)
 
         setContentView(root)
 
