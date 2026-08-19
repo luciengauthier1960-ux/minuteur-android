@@ -26,7 +26,9 @@
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:excludeFromRecents="true" />
-
+<activity
+    android:name=".ChronometerActivity"
+    android:exported="false" />
         <receiver
             android:name=".AlarmReceiver"
             android:exported="false" />
