@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -13,7 +14,8 @@ import java.util.Locale
 
 class ChronometerActivity : Activity() {
 
-    private lateinit var timeDisplay: TextView
+    private lateinit var minutesDisplay: TextView
+    private lateinit var secondsDisplay: TextView
     private lateinit var startPauseButton: Button
 
     private val handler = Handler(Looper.getMainLooper())
@@ -45,12 +47,54 @@ class ChronometerActivity : Activity() {
             setPadding(0, 0, 0, 48)
         }
 
-        timeDisplay = TextView(this).apply {
-            text = "00:00.00"
+        val displayRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+
+        val columnParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+            marginStart = 8
+            marginEnd = 8
+        }
+
+        // Colonne "Minutes"
+        val minutesColumn = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+        }
+        val minutesLabel = TextView(this).apply {
+            text = "Minutes"
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 8)
+        }
+        minutesDisplay = TextView(this).apply {
+            text = "00"
             textSize = 40f
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, 48)
         }
+        minutesColumn.addView(minutesLabel)
+        minutesColumn.addView(minutesDisplay)
+
+        // Colonne "Secondes"
+        val secondsColumn = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+        }
+        val secondsLabel = TextView(this).apply {
+            text = "Secondes"
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 8)
+        }
+        secondsDisplay = TextView(this).apply {
+            text = "00.00"
+            textSize = 40f
+            gravity = Gravity.CENTER
+        }
+        secondsColumn.addView(secondsLabel)
+        secondsColumn.addView(secondsDisplay)
+
+        displayRow.addView(minutesColumn, columnParams)
+        displayRow.addView(secondsColumn, columnParams)
 
         startPauseButton = Button(this).apply {
             text = "Démarrer"
@@ -63,7 +107,12 @@ class ChronometerActivity : Activity() {
         }
 
         root.addView(title)
-        root.addView(timeDisplay)
+        root.addView(
+            displayRow,
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                bottomMargin = 48
+            }
+        )
         root.addView(startPauseButton)
         root.addView(resetButton)
 
@@ -97,7 +146,8 @@ class ChronometerActivity : Activity() {
         val minutes = (elapsedMs / 60000) % 60
         val seconds = (elapsedMs / 1000) % 60
         val hundredths = (elapsedMs % 1000) / 10
-        timeDisplay.text = String.format(Locale.FRANCE, "%02d:%02d.%02d", minutes, seconds, hundredths)
+        minutesDisplay.text = String.format(Locale.FRANCE, "%02d", minutes)
+        secondsDisplay.text = String.format(Locale.FRANCE, "%02d.%02d", seconds, hundredths)
     }
 
     override fun onDestroy() {
