@@ -1,9 +1,11 @@
 package com.example.minuteur
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -108,6 +110,7 @@ class MainActivity : Activity() {
         setContentView(root)
 
         checkExactAlarmPermission()
+        requestNotificationPermissionIfNeeded()
     }
 
     private fun checkExactAlarmPermission() {
@@ -119,6 +122,14 @@ class MainActivity : Activity() {
                     Uri.parse("package:$packageName")
                 )
                 startActivity(intent)
+            }
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
             }
         }
     }
@@ -150,6 +161,8 @@ class MainActivity : Activity() {
         )
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+
+        AlarmNotification.show(this, "Sonnera dans ${minutes} min ${seconds} s")
 
         Toast.makeText(this, "Alarme programmée dans ${minutes} min ${seconds} s", Toast.LENGTH_SHORT).show()
     }
