@@ -6,6 +6,7 @@ import android.content.Intent
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        AlarmNotification.cancel(context)
         AlarmSound.start(context)
 
         val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
