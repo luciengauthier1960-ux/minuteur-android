@@ -134,7 +134,7 @@ class MainActivity : Activity() {
         }
     }
 
-       private fun scheduleAlarm() {
+    private fun scheduleAlarm() {
         val minutes = minutesInput.text.toString().toIntOrNull() ?: 0
         val seconds = secondsInput.text.toString().toIntOrNull() ?: 0
         val totalSeconds = minutes * 60 + seconds
@@ -165,3 +165,4 @@ class MainActivity : Activity() {
 
         Toast.makeText(this, "Alarme programmée dans ${minutes} min ${seconds} s", Toast.LENGTH_SHORT).show()
     }
+}
