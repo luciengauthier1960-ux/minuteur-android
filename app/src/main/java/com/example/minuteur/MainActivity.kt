@@ -134,7 +134,7 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun scheduleAlarm() {
+       private fun scheduleAlarm() {
         val minutes = minutesInput.text.toString().toIntOrNull() ?: 0
         val seconds = secondsInput.text.toString().toIntOrNull() ?: 0
         val totalSeconds = minutes * 60 + seconds
