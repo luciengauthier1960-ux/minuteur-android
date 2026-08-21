@@ -145,13 +145,6 @@ class MainActivity : Activity() {
         }
 
         val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            Toast.makeText(this, "Autorise d'abord les alarmes exactes dans les réglages", Toast.LENGTH_LONG).show()
-            checkExactAlarmPermission()
-            return
-        }
-
         val triggerAt = System.currentTimeMillis() + totalSeconds * 1000L
 
         val intent = Intent(this, AlarmReceiver::class.java)
@@ -160,10 +153,15 @@ class MainActivity : Activity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+        val showIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmClockInfo = AlarmManager.AlarmClockInfo(triggerAt, showIntent)
+        alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
 
         AlarmNotification.show(this, "Sonnera dans ${minutes} min ${seconds} s")
 
         Toast.makeText(this, "Alarme programmée dans ${minutes} min ${seconds} s", Toast.LENGTH_SHORT).show()
     }
-}
