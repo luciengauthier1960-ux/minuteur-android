@@ -2,14 +2,10 @@ package com.example.minuteur
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.text.InputType
 import android.view.Gravity
 import android.view.ViewGroup
@@ -109,21 +105,7 @@ class MainActivity : Activity() {
 
         setContentView(root)
 
-        checkExactAlarmPermission()
         requestNotificationPermissionIfNeeded()
-    }
-
-    private fun checkExactAlarmPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-            if (!alarmManager.canScheduleExactAlarms()) {
-                val intent = Intent(
-                    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                    Uri.parse("package:$packageName")
-                )
-                startActivity(intent)
-            }
-        }
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -144,24 +126,15 @@ class MainActivity : Activity() {
             return
         }
 
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val triggerAt = System.currentTimeMillis() + totalSeconds * 1000L
+        val serviceIntent = Intent(this, AlarmForegroundService::class.java).apply {
+            putExtra(AlarmForegroundService.EXTRA_TOTAL_SECONDS, totalSeconds)
+        }
 
-        val intent = Intent(this, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val showIntent = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val alarmClockInfo = AlarmManager.AlarmClockInfo(triggerAt, showIntent)
-        alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
-
-        AlarmNotification.show(this, "Sonnera dans ${minutes} min ${seconds} s")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
 
         Toast.makeText(this, "Alarme programmée dans ${minutes} min ${seconds} s", Toast.LENGTH_SHORT).show()
     }
